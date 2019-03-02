@@ -43,13 +43,23 @@ Input:
 Activations:
 ![Activations](https://lh3.googleusercontent.com/-nQ8DuYoow98/XHp5fZh91II/AAAAAAAAAXA/Ho70JLqmvngmc_gy5MRht9obzNJ5W_1-QCL0BGAYYCw/h578/2019-03-02.png)
 
-## After 500 iteration with `batch_size=2`
+## After 1000 iteration with `batch_size=2`
 
 Input:
-![Input]()
+![Input](https://plus.google.com/u/0/photos/albums/pcvhpi9bsgugshktn44ms9i9rm9gnjk34?pid=6663791313794764578&oid=108416174423949606030)
 
 Activations:
-![Activations]()
+![Activations](https://lh3.googleusercontent.com/-FSuuz4f-3zM/XHqK7JUn9_I/AAAAAAAAAXQ/7iOsGsuWINIdbubacaHXPhtELT-enJKUACL0BGAYYCw/h578/2019-03-02.png)
+
+## After 1100 iteration with `batch_size=2`
+
+Input:
+![Input](https://lh3.googleusercontent.com/-b-Bsz-X4Zcg/XHqLry3Ce1I/AAAAAAAAAXY/TxggAuMn3r0V-O0pSTLXf7k8YQA6NictgCL0BGAYYCw/h269/2019-03-02.png)
+
+Activations:
+![Activations](https://lh3.googleusercontent.com/--lQPxg8U0aM/XHqLupFab6I/AAAAAAAAAXc/WWcxbJuijBQIc9e1NBoH6tc_RGTQbtCHQCL0BGAYYCw/h578/2019-03-02.png)
+
+
 
 
 
