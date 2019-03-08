@@ -35,7 +35,7 @@ python3 init.py --mode test -m /path/to/the/pretrained/model.pth -i /path/to/ima
 python3 init.py --help
 ```
 
---
+---
 
 0. If you want to download the cityscapes dataset
 ```
