@@ -1,6 +1,8 @@
-from .assp import ASSP
-from .resnet-50 import ResNet_50
+import torch
+import torch.nn as nn
 
+from .assp import ASSP
+from .resnet_50 import ResNet_50
 
 class DeepLabv3(nn.Module):
   def __init__(self, nc):

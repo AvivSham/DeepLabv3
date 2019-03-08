@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from utils import *
-from models.deeplabv3 import DeepLabV3
+from models.deeplabv3 import DeepLabv3
 import sys
 from tqdm import tqdm
 
@@ -24,20 +24,21 @@ def train(FLAGS):
     print ('[INFO]Defined all the hyperparameters successfully!')
     
     # Get the class weights
-    print ('[INFO]Starting to define the class weights...')
-    pipe = loader(ip, lp, batch_size='all')
-    class_weights = get_class_weights(pipe, nc)
-    print ('[INFO]Fetched all class weights successfully!')
+    #print ('[INFO]Starting to define the class weights...')
+    #pipe = loader(ip, lp, batch_size='all')
+    #class_weights = get_class_weights(pipe, nc)
+    #print ('[INFO]Fetched all class weights successfully!')
 
     # Get an instance of the model
-    deeplabv3 = DeepLabV3(nc)
+    deeplabv3 = DeepLabv3(nc)
     print ('[INFO]Model Instantiated!')
     
     # Move the model to cuda if available
-    deeplabv3 = deeplabv3.to(device)
+    deeplabv3.to(device)
 
     # Define the criterion and the optimizer
-    criterion = nn.CrossEntropyLoss(weight=torch.FloatTensor(class_weights).to(device))
+    #criterion = nn.CrossEntropyLoss(weight=torch.FloatTensor(class_weights).to(device))
+    criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(deeplabv3.parameters(),
                                  lr=lr,
                                  weight_decay=wd)
@@ -55,7 +56,7 @@ def train(FLAGS):
     bc_eval = 101 // batch_size
 
     pipe = loader(ip, lp, batch_size)
-    eval_pipe = loader(ipv, lpv, batch_size)
+    #eval_pipe = loader(ipv, lpv, batch_size)
 
     epochs = epochs
             

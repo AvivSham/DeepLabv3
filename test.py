@@ -10,7 +10,7 @@ Original file is located at
 import torch
 import torch.nn as nn
 from utils import *
-from models.deeplabv3 import DeepLabV3
+from models.deeplabv3 import DeepLabv3
 import sys
 import os
 from tqdm import tqdm
@@ -29,7 +29,7 @@ def test(FLAGS):
     checkpoint = torch.load(FLAGS.model_path,  map_location='cpu')
     
     # Assuming the dataset is camvid
-    deeplabv3 = DeepLabV3(12)
+    deeplabv3 = DeepLabv3(12)
     deeplabv3.load_state_dict(checkpoint['state_dict'])
 
     tmg_ = plt.imread(FLAGS.image_path)
@@ -37,8 +37,7 @@ def test(FLAGS):
     tmg = torch.tensor(tmg_).unsqueeze(0).float()
     tmg = tmg.transpose(2, 3).transpose(1, 2)
 
-    with torch.no_grad():
-        out1 = deeplabv3(tmg.float()).squeeze(0)
+    out1 = deeplabv3(tmg.float()).squeeze(0)
     
     #smg_ = Image.open('/content/training/semantic/' + fname)
     #smg_ = cv2.resize(np.array(smg_), (512, 512), cv2.INTER_NEAREST)

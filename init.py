@@ -8,8 +8,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-m',
                         type=str,
-                        default='./datasets/CamVid/ckpt-camvid-enet.pth',
-                        help='The path to the pretrained enet model')
+                        default='./datasets/CityScapes/ckpt-cscapes.pth',
+                        help='The path to the pretrained cscapes model')
 
     parser.add_argument('-i', '--image-path',
                         type=str,
@@ -17,27 +17,27 @@ if __name__ == '__main__':
 
     parser.add_argument('-rh', '--resize-height',
                         type=int,
-                        default=512,
+                        default=1024,
                         help='The height for the resized image')
 
     parser.add_argument('-rw', '--resize-width',
                         type=int,
-                        default=512,
+                        default=2048,
                         help='The width for the resized image')
 
     parser.add_argument('-lr', '--learning-rate',
                         type=float,
-                        default=5e-4,
+                        default=1e-3,
                         help='The learning rate')
 
     parser.add_argument('-bs', '--batch-size',
                         type=int,
-                        default=10,
+                        default=2,
                         help='The batch size')
 
     parser.add_argument('-wd', '--weight-decay',
                         type=float,
-                        default=2e-4,
+                        default=1e-4,
                         help='The weight decay')
 
     parser.add_argument('-c', '--constant',
@@ -47,12 +47,12 @@ if __name__ == '__main__':
 
     parser.add_argument('-e', '--epochs',
                         type=int,
-                        default=102,
+                        default=100,
                         help='The number of epochs')
 
     parser.add_argument('-nc', '--num-classes',
                         type=int,
-                        default=102,
+                        default=34,
                         help='The number of epochs')
 
     parser.add_argument('-se', '--save-every',
@@ -62,32 +62,26 @@ if __name__ == '__main__':
 
     parser.add_argument('-iptr', '--input-path-train',
                         type=str,
-                        default='./datasets/CamVid/train/',
                         help='The path to the input dataset')
 
     parser.add_argument('-lptr', '--label-path-train',
                         type=str,
-                        default='./datasets/CamVid/trainannot/',
                         help='The path to the label dataset')
 
     parser.add_argument('-ipv', '--input-path-val',
                         type=str,
-                        default='./datasets/CamVid/val/',
                         help='The path to the input dataset')
 
     parser.add_argument('-lpv', '--label-path-val',
                         type=str,
-                        default='./datasets/CamVid/valannot/',
                         help='The path to the label dataset')
 
     parser.add_argument('-iptt', '--input-path-test',
                         type=str,
-                        default='./datasets/CamVid/test/',
                         help='The path to the input dataset')
 
     parser.add_argument('-lptt', '--label-path-test',
                         type=str,
-                        default='./datasets/CamVid/testannot/',
                         help='The path to the label dataset')
 
     parser.add_argument('-pe', '--print-every',
@@ -114,11 +108,15 @@ if __name__ == '__main__':
 
     FLAGS.cuda = torch.device('cuda:0' if torch.cuda.is_available() and FLAGS.cuda \
                                else 'cpu')
+    
+    print ('[INFO]Arguments read successfully!')
 
     if FLAGS.mode.lower() == 'train':
+        print ('[INFO]Train Mode.')
         train(FLAGS)
     elif FLAGS.mode.lower() == 'test':
-        test(FLAGS)
+        print ('[INFO]Predict Mode.')
+        predict(FLAGS)
     else:
         raise RuntimeError('Unknown mode passed. \n Mode passed should be either \
                             of "train" or "test"')

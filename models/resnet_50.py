@@ -1,3 +1,7 @@
+import torch
+import torch.nn as nn
+from torchvision import models
+
 class ResNet_50 (nn.Module):
   def __init__(self, in_channels = 3, conv1_out = 64):
     super(ResNet_50,self).__init__()

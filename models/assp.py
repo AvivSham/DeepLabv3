@@ -1,3 +1,6 @@
+import torch
+import torch.nn as nn
+
 class ASSP(nn.Module):
   def __init__(self, nc,in_channels=1024, out_channels = 256):
     super(ASSP,self).__init__()

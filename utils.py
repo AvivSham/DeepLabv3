@@ -44,6 +44,62 @@ def create_class_mask(img, color_map, is_normalized_img=True, is_normalized_map=
     return np.array(mask)
 
 
+# Cityscapes dataset Loader
+
+def loader_cscapes(input_path, segmented_path, batch_size, h=1024, w=2048, limited=False):
+    filenames_t = sorted(glob.glob(input_path + '/**/*.png', recursive=True), key=lambda x : int(x.split('/')[-1].split('_')[1] + x.split('/')[-1].split('_')[2]))
+    total_files_t = len(filenames_t)
+    
+    filenames_s = sorted(glob.glob(segmented_path + '/**/*labelIds.png', recursive=True), key=lambda x : int(x.split('/')[-1].split('_')[1] + x.split('/')[-1].split('_')[2]))
+    
+    total_files_s = len(filenames_s)
+    
+    assert(total_files_t == total_files_s)
+    
+    batches = np.random.permutation(np.arange(total_files_s))
+    idx0 = 0
+    idx1 = idx0 + batch_size
+    
+    if str(batch_size).lower() == 'all':
+        batch_size = total_files_s
+    
+    idx = 1 if not limited else total_files_s // batch_size + 1
+    while(idx):
+      
+        batch = np.arange(idx0, idx1)
+      
+        # Choosing random indexes of images and labels
+        batch_idxs = np.random.randint(0, total_files_s, batch_size)
+        
+        inputs = []
+        labels = []
+        
+        for jj in batch_idxs:
+            # Reading normalized photo
+            img = np.array(Image.open(filenames_t[jj]))
+            # Resizing using nearest neighbor method
+            inputs.append(img)
+          
+            # Reading semantic image
+            img = Image.open(filenames_s[jj])
+            img = np.array(img)
+            # Resizing using nearest neighbor method
+            labels.append(img)
+         
+        inputs = np.stack(inputs, axis=2)
+        # Changing image format to C x H x W
+        inputs = torch.tensor(inputs).transpose(0, 2).transpose(1, 3)
+        
+        labels = torch.tensor(labels)
+        
+        idx0 = idx1 if idx1 + batch_size < total_files_s else 0
+        idx1 = idx0 + batch_size
+        
+        if limited:
+          idx -= 1
+          
+        yield inputs, labels
+
 def loader(training_path, segmented_path, batch_size, h=512, w=512):
     """
     The Loader to generate inputs and labels from the Image and Segmented Directory
@@ -74,7 +130,6 @@ def loader(training_path, segmented_path, batch_size, h=512, w=512):
     while(1):
         batch_idxs = np.random.randint(0, total_files_s, batch_size)
             
-        
         inputs = []
         labels = []
         
