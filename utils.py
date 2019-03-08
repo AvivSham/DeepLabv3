@@ -151,7 +151,7 @@ def loader(training_path, segmented_path, batch_size, h=512, w=512):
         yield inputs, labels
 
 
-def decode_segmap(image):
+def decode_segmap_camvid(image):
     Sky = [128, 128, 128]
     Building = [128, 0, 0]
     Pole = [192, 192, 128]
@@ -183,6 +183,42 @@ def decode_segmap(image):
     rgb[:, :, 1] = g
     rgb[:, :, 2] = b
 
+    return rgb
+
+def decode_segmap_cscapes(image, nc=34):
+    
+    label_colours = np.array([(0, 0, 0),  # 0=background
+                              (0, 0, 0),  # 1=ego vehicle
+                              (0, 0, 0),  # 2=rectification border
+                              (0, 0, 0),  # 3=out of toi
+                              (0, 0, 0),  # 4=static
+                 # 5=dynamic,    6=ground,       7=road,       8=sidewalk,    9=parking
+                 (111, 74,  0),  ( 81,  0, 81), (128, 64,128), (244, 35,232), (250,170,160),
+                 # 10=rail track, 11=building,     12=wall,       13=fence,       14=guard rail
+                 (230,150,140),  ( 70, 70, 70), (102,102,156), (190,153,153), (180,165,180),
+                 # 15=bridge,   16=tunnel,     17=pole,       18=pole group, 19=traffic light
+                 (150,100,100), (150,120, 90), (153,153,153), (153,153,153), (250,170, 30),
+                 # 20=traffic sign, 21=vegetation, 22=terrain,    23=sky,        24=person
+                 (220,220,  0),     (107,142, 35), (152,251,152), ( 70,130,180), (220, 20, 60),
+                 # 25=rider,    26=car,        27=truck,      28=bus,        29=caravan, 
+                 (255,  0,  0), (  0,  0,142), (  0,  0, 70), (  0, 60,100), (  0,  0, 90),
+                 # 30=trailer,  31=train,        32=motorcycle, 33=bicycle,        34=license plate, 
+                 (  0,  0,110), (  0, 80,100),   (  0,  0,230), (119, 11, 32), (  0,  0,142),
+                 ])
+    
+    r = np.zeros_like(image).astype(np.uint8)
+    g = np.zeros_like(image).astype(np.uint8)
+    b = np.zeros_like(image).astype(np.uint8)
+    
+    for l in range(0, nc):
+        r[image == l] = label_colours[l, 0]
+        g[image == l] = label_colours[l, 1]
+        b[image == l] = label_colours[l, 2]
+
+    rgb = np.zeros((image.shape[0], image.shape[1], 3)).astype(np.uint8)
+    rgb[:, :, 0] = b
+    rgb[:, :, 1] = g
+    rgb[:, :, 2] = r
     return rgb
 
 def show_images(images, in_row=True):

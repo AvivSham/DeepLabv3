@@ -62,10 +62,12 @@ if __name__ == '__main__':
 
     parser.add_argument('-iptr', '--input-path-train',
                         type=str,
+                        required=True,
                         help='The path to the input dataset')
 
     parser.add_argument('-lptr', '--label-path-train',
                         type=str,
+                        required=True,
                         help='The path to the label dataset')
 
     parser.add_argument('-ipv', '--input-path-val',
@@ -104,6 +106,16 @@ if __name__ == '__main__':
                         default='train',
                         help='Whether to train or test')
     
+    parser.add_argument('-dt', '--dtype',
+                        choices=['cityscapes', 'pascal'],
+                        default='pascal',
+                        help='specify the dataset you are using')
+    
+    parser.add_argument('--scheduler',
+                        type=bool,
+                        default=False,
+                        help='Whether to use scheduler or not')
+
     FLAGS, unparsed = parser.parse_known_args()
 
     FLAGS.cuda = torch.device('cuda:0' if torch.cuda.is_available() and FLAGS.cuda \

@@ -17,10 +17,26 @@ def train(FLAGS):
     save_every = FLAGS.save_every
     nc = FLAGS.num_classes
     wd = FLAGS.weight_decay
+
     ip = FLAGS.input_path_train
     lp = FLAGS.label_path_train
+
     ipv = FLAGS.input_path_val
     lpv = FLAGS.label_path_val
+    
+    H = FLAGS.resize_height
+    W = FLAGS.resize_width
+
+    dtype = FLAGS.dtype
+    sched = FLAGS.scheduler
+    
+    if FLAGS.dtype == 'cityscapes':
+        train_samples = len(glob.glob(ip + '/**/*.png', recursive=True))
+        eval_samples = len(glob.glob(lp + '/**/*.png', recursive=True))
+    elif FLAGS.dtype == 'pascal':
+        train_samples = len(os.listdir(lp))
+        eval_samples = len(os.listdir(lp))
+
     print ('[INFO]Defined all the hyperparameters successfully!')
     
     # Get the class weights
@@ -30,16 +46,16 @@ def train(FLAGS):
     #print ('[INFO]Fetched all class weights successfully!')
 
     # Get an instance of the model
-    deeplabv3 = DeepLabv3(nc)
+    model = DeepLabv3(nc)
     print ('[INFO]Model Instantiated!')
     
     # Move the model to cuda if available
-    deeplabv3.to(device)
+    model.to(device)
 
     # Define the criterion and the optimizer
     #criterion = nn.CrossEntropyLoss(weight=torch.FloatTensor(class_weights).to(device))
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(deeplabv3.parameters(),
+    optimizer = torch.optim.Adam(model.parameters(),
                                  lr=lr,
                                  weight_decay=wd)
     print ('[INFO]Defined the loss function and the optimizer')
@@ -51,77 +67,77 @@ def train(FLAGS):
     train_losses = []
     eval_losses = []
     
-    # Assuming we are using the CamVid Dataset
-    bc_train = 367 // batch_size
-    bc_eval = 101 // batch_size
-
-    pipe = loader(ip, lp, batch_size)
+    if dtype == 'cityscapes':
+        pipe = loader_cscapes(ip, lp, batch_size, h = H, w = W)
+    elif dtype == 'pascal':
+        pipe = loader(ip, lp, batch_size, h = H, w = W)
     #eval_pipe = loader(ipv, lpv, batch_size)
 
-    epochs = epochs
-            
+    show_every = 250
+
+    train_losses = []
+    eval_losses = []
+
+    bc_train = train_samples // batch_size
+    bc_eval = eval_samples // batch_size
+
+    if sched:
+        scheduler = optim.lr_scheduler.LambdaLR(optimizer, lambda epoch: (1 - (epoch / epochs)) ** 0.9)
+
     for e in range(1, epochs+1):
-            
+
         train_loss = 0
         print ('-'*15,'Epoch %d' % e, '-'*15)
         
-        deeplabv3.train()
+        if sched:
+            scheduler.step()
         
-        for _ in tqdm(range(bc_train)):
+        model.train()
+
+        for ii in tqdm(range(bc_train)):
             X_batch, mask_batch = next(pipe)
-            
-            #assert (X_batch >= 0. and X_batch <= 1.0).all()
             
             X_batch, mask_batch = X_batch.to(device), mask_batch.to(device)
 
             optimizer.zero_grad()
 
-            out = deeplabv3(X_batch.float())
-
+            out = model(X_batch.float())
+            
             loss = criterion(out, mask_batch.long())
             loss.backward()
             optimizer.step()
 
             train_loss += loss.item()
-
             
+            if ii % show_every == 0:
+                out5 = show_cscpaes(model, H, W)
+                checkpoint = {
+                    'epochs' : e,
+                    'model_state_dict' : model.state_dict(),
+                    'opt_state_dict' : optimizer.state_dict()
+                }
+                torch.save(checkpoint, './ckpt-dlabv3-{}-{:2f}.pth'.format(e, train_loss))
+                print ('Model saved!')
+
         print ()
         train_losses.append(train_loss)
-        
+
         if (e+1) % print_every == 0:
             print ('Epoch {}/{}...'.format(e, epochs),
                     'Loss {:6f}'.format(train_loss))
         
-        if e % eval_every == 0:
-            with torch.no_grad():
-                deeplabv3.eval()
-                
-                eval_loss = 0
-                
-                for _ in tqdm(range(bc_eval)):
-                    inputs, labels = next(eval_pipe)
-
-                    inputs, labels = inputs.to(device), labels.to(device)
-                    out = deeplabv3(inputs)
-                    
-                    loss = criterion(out, labels.long())
-
-                    eval_loss += loss.item()
-
-                print ()
-                print ('Loss {:6f}'.format(eval_loss))
-                
-                eval_losses.append(eval_loss)
-            
         if e % save_every == 0:
+
+            show_pascal(model, training_path, all_tests[np.random.randint(0, len(all_tests))])
             checkpoint = {
                 'epochs' : e,
-                'state_dict' : deeplabv3.state_dict()
+                'state_dict' : model.state_dict()
             }
-            torch.save(checkpoint, './ckpt-deeplabv3-{}-{}.pth'.format(e, train_loss))
+            torch.save(checkpoint, '/content/ckpt-enet-{}-{:2f}.pth'.format(e, train_loss))
             print ('Model saved!')
-
-        print ('Epoch {}/{}...'.format(e+1, epochs),
-               'Total Mean Loss: {:6f}'.format(sum(train_losses) / epochs))
+        
+        
+    #     show(model, all_tests[np.random.randint(0, len(all_tests))])
+    #     show_pascal(model, training_path, all_tests[np.random.randint(0, len(all_tests))])
 
     print ('[INFO]Training Process complete!')
