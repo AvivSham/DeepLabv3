@@ -22,7 +22,7 @@ cd DeepLabv3/
 
 1. Use this command to train the model
 ```
-python3 init.py --mode train -iptr path/to/train/input/set/ -lptr /path/to/label/set/ --cuda False
+python3 init.py --mode train -iptr path/to/train/input/set/ -lptr /path/to/label/set/ --cuda False --
 ```
 
 2. Use this command to test the model
@@ -35,6 +35,17 @@ python3 init.py --mode test -m /path/to/the/pretrained/model.pth -i /path/to/ima
 python3 init.py --help
 ```
 
+--
+
+0. If you want to download the cityscapes dataset
+```
+sh ./datasets/dload.sh cityscapes <your_username> <your_password>
+```
+
+1. If you want to download the PASCAL VOC 2012 datasets
+```
+sh ./datasets/dload.sh pascal
+```
 
 ## Results
 
