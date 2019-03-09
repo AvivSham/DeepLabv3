@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from .assp import ASSP
 from .resnet_50 import ResNet_50

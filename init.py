@@ -8,7 +8,6 @@ if __name__ == '__main__':
 
     parser.add_argument('-m',
                         type=str,
-                        default='./datasets/CityScapes/ckpt-cscapes.pth',
                         help='The path to the pretrained cscapes model')
 
     parser.add_argument('-i', '--image-path',
@@ -52,7 +51,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-nc', '--num-classes',
                         type=int,
-                        default=34,
+                        required=True,
                         help='The number of epochs')
 
     parser.add_argument('-se', '--save-every',
@@ -114,6 +113,11 @@ if __name__ == '__main__':
                         default=False,
                         help='Whether to use scheduler or not')
 
+    parser.add_argument('--save',
+                        type=bool,
+                        default=True,
+                        help='Save the segmented image when predicting')
+
     FLAGS, unparsed = parser.parse_known_args()
 
     FLAGS.cuda = torch.device('cuda:0' if torch.cuda.is_available() and FLAGS.cuda \
@@ -123,7 +127,12 @@ if __name__ == '__main__':
 
     if FLAGS.mode.lower() == 'train':
         print ('[INFO]Train Mode.')
+
+        if FLAGS.iptr == None or FLAGS.ipv == None:
+            raise ('Error: Kindly provide the path to the dataset')
+
         train(FLAGS)
+
     elif FLAGS.mode.lower() == 'test':
         print ('[INFO]Predict Mode.')
         predict(FLAGS)
