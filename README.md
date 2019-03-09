@@ -22,12 +22,12 @@ cd DeepLabv3/
 
 1. Use this command to train the model
 ```
-python3 init.py --mode train -iptr path/to/train/input/set/ -lptr /path/to/label/set/ --cuda False --
+python3 init.py --mode train -iptr path/to/train/input/set/ -lptr /path/to/label/set/ --cuda False -nc <number_of_classes>
 ```
 
 2. Use this command to test the model
 ```
-python3 init.py --mode test -m /path/to/the/pretrained/model.pth -i /path/to/image/to/infer.png
+python3 init.py --mode test -m /path/to/model.pth -i /path/to/image.png -nc <number_of_classes>
 ```
 
 3. Use `--help` to get more commands
@@ -36,6 +36,7 @@ python3 init.py --help
 ```
 
 ---
+
 
 0. If you want to download the cityscapes dataset
 ```
