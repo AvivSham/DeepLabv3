@@ -62,12 +62,10 @@ if __name__ == '__main__':
 
     parser.add_argument('-iptr', '--input-path-train',
                         type=str,
-                        required=True,
                         help='The path to the input dataset')
 
     parser.add_argument('-lptr', '--label-path-train',
                         type=str,
-                        required=True,
                         help='The path to the label dataset')
 
     parser.add_argument('-ipv', '--input-path-val',
